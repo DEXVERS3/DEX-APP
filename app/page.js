@@ -33,6 +33,8 @@ function buildMockOutput(input, mode) {
 
   return `${header}\n\n${trimmed}\n\n—\nDex v1 shell is live. Next: wire the Generate button to your Dex engine.`;
 }';
+Remove leftover mock function fragment
+  
 export default function Page() {
   const [mode, setMode] = useState('post');
   const [input, setInput] = useState('');
