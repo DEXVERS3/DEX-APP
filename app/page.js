@@ -32,7 +32,7 @@ function buildMockOutput(input, mode) {
         : 'Notes (Strategy)';
 
   return `${header}\n\n${trimmed}\n\n—\nDex v1 shell is live. Next: wire the Generate button to your Dex engine.`;
-}
+}';
 
 export default function Page() {
   const [mode, setMode] = useState('post');
@@ -41,9 +41,32 @@ export default function Page() {
 
   const preset = useMemo(() => MODE_PRESETS[mode], [mode]);
 
-  const onGenerate = () => {
-    setOutput(buildMockOutput(input, mode));
-  };
+ const onGenerate = async () => {
+  const trimmed = (input || '').trim();
+  if (!trimmed) return;
+
+  setOutput('Generating…');
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: trimmed, mode }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setOutput(`Error: ${data?.error || 'Request failed.'}\n\n${data?.detail || ''}`);
+      return;
+    }
+
+    setOutput(data.output || '(Empty output.)');
+  } catch (err) {
+    setOutput(`Error: ${String(err?.message || err)}`);
+  }
+};
+
 
   const onCopy = async () => {
     try {
