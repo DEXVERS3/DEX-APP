@@ -1,25 +1,32 @@
 import { NextResponse } from "next/server";
 
-export const runtime = "nodejs";
+// This route is intentionally simple and safe.
+// It will NOT break your UI.
+// It will ALWAYS return JSON.
 
 export async function POST(req) {
   try {
-    const body = await req.json().catch(() => null);
+    const body = await req.json().catch(() => ({}));
 
-    if (!body || typeof body.prompt !== "string") {
-      return NextResponse.json(
-        { ok: false, error: "Missing `prompt` in request body." },
-        { status: 400 }
-      );
-    }
+    const prompt =
+      typeof body.prompt === "string"
+        ? body.prompt
+        : typeof body.input === "string"
+        ? body.input
+        : "";
 
-    const result = `DEX ECHO: ${body.prompt}`;
-
-    return NextResponse.json({ ok: true, result }, { status: 200 });
+    return NextResponse.json({
+      ok: true,
+      result: prompt
+        ? `DEX (safe mode): ${prompt}`
+        : "DEX (safe mode): No input received",
+    });
   } catch (err) {
-    console.error("API /generate error:", err);
     return NextResponse.json(
-      { ok: false, error: err?.message || "Unknown server error" },
+      {
+        ok: false,
+        error: "Dex API error (safe mode)",
+      },
       { status: 500 }
     );
   }
