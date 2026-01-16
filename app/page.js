@@ -18,24 +18,70 @@ export default function Home() {
   }
 
   return (
-    <main style={{ padding: 40, maxWidth: 900, margin: '0 auto' }}>
-      <h1>DEX</h1>
+    <main
+      style={{
+        minHeight: '100vh',
+        background: '#0b0b0b',
+        color: '#ffffff',
+        padding: '60px 24px',
+        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont'
+      }}
+    >
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <h1 style={{ fontSize: 42, marginBottom: 8 }}>DEX</h1>
+        <p style={{ color: '#b5b5b5', marginBottom: 32 }}>
+          Your voice. At scale.
+        </p>
 
-      <textarea
-        placeholder="Enter text here"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        rows={10}
-        style={{ width: '100%', fontSize: 16 }}
-      />
+        <textarea
+          placeholder="Drop your raw thoughts here…"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={10}
+          style={{
+            width: '100%',
+            background: '#111',
+            color: '#fff',
+            border: '1px solid #333',
+            borderRadius: 6,
+            padding: 14,
+            fontSize: 16
+          }}
+        />
 
-      <div style={{ marginTop: 12 }}>
-        <button onClick={generate} style={{ padding: '10px 14px', fontSize: 16 }}>
-          Generate
-        </button>
+        <div style={{ marginTop: 16 }}>
+          <button
+            onClick={generate}
+            style={{
+              background: '#ffffff',
+              color: '#000',
+              padding: '10px 18px',
+              fontSize: 15,
+              borderRadius: 6,
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            Generate
+          </button>
+        </div>
+
+        {out && (
+          <pre
+            style={{
+              marginTop: 32,
+              whiteSpace: 'pre-wrap',
+              background: '#111',
+              padding: 16,
+              borderRadius: 6,
+              border: '1px solid #333'
+            }}
+          >
+            {out}
+          </pre>
+        )}
       </div>
-
-      <pre style={{ marginTop: 18, whiteSpace: 'pre-wrap' }}>{out}</pre>
     </main>
   );
 }
+
