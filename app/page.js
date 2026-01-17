@@ -3,22 +3,22 @@
 import { useMemo, useState } from 'react';
 
 const MODES = {
-  post: {
-    label: 'Post',
+  signal: {
+    label: 'Signal',
     hint: 'What do you want to say publicly?',
   },
-  email: {
-    label: 'Email',
-    hint: 'What do you want to say in this email?',
+  conversation: {
+    label: 'Conversation',
+    hint: 'What do you want to say to one person?',
   },
   strategy: {
     label: 'Strategy',
-    hint: 'What are you deciding or trying to solve?',
+    hint: 'What are you trying to decide or win?',
   },
 };
 
 export default function Home() {
-  const [mode, setMode] = useState('post');
+  const [mode, setMode] = useState('signal');
   const [text, setText] = useState('');
   const [out, setOut] = useState('');
   const [busy, setBusy] = useState(false);
@@ -32,11 +32,14 @@ export default function Home() {
       const r = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // backend currently expects { text }. We keep it stable.
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, mode }),
       });
 
       const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setOut(j?.error ? `Error: ${j.error}` : `Error: ${r.status}`);
+        return;
+      }
       setOut(j.output ?? 'Output could not be parsed.');
     } catch (e) {
       setOut(`Error: ${String(e?.message || e)}`);
@@ -61,7 +64,6 @@ export default function Home() {
       }}
     >
       <div style={{ maxWidth: 960, margin: '0 auto', position: 'relative' }}>
-        {/* Top right */}
         <button
           type="button"
           title="Coming soon"
@@ -87,7 +89,6 @@ export default function Home() {
           <span style={{ fontWeight: 600, color: '#eaeaea' }}>Your Voice.</span> On Demand.
         </div>
 
-        {/* Mode buttons */}
         <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
           {Object.entries(MODES).map(([k, v]) => {
             const active = mode === k;
@@ -112,7 +113,6 @@ export default function Home() {
           })}
         </div>
 
-        {/* Input */}
         <div style={{ marginTop: 18, fontSize: 12, color: '#b5b5b5' }}>Input</div>
         <textarea
           placeholder={placeholder}
@@ -133,7 +133,6 @@ export default function Home() {
           }}
         />
 
-        {/* Action buttons */}
         <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
           <button
             type="button"
@@ -169,7 +168,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Output */}
         <div style={{ marginTop: 22, fontSize: 12, color: '#b5b5b5' }}>Output</div>
         <div
           style={{
@@ -188,7 +186,6 @@ export default function Home() {
           {out || 'Output will appear here'}
         </div>
 
-        {/* Footer */}
         <div
           style={{
             marginTop: 18,
