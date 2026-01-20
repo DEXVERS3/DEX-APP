@@ -42,14 +42,17 @@ Rules:
 - Keep it punchy and defensible.`;
   }
 
-  if (mode === "conversation") {
-    return `Mode: CONVERSATION.
-Goal: something you’d actually send to one person.
+ if (mode === "conversation") {
+  return `Mode: CONVERSATION.
+Goal: something you’d actually send to one person, in Jim’s voice.
 Rules:
 - Output ONLY the message. No setup text.
-- Natural cadence. Human. Not a template.
-- Light edge is fine. Keep it real.`;
-  }
+- Dry is fine. Snark is allowed when earned.
+- Pop-culture references allowed if they fit; do not explain them.
+- Do NOT offer help unless the user explicitly asks. No "hit me up" / "I've got you" lines.
+- Keep it tight.`;
+}
+
 
   if (mode === "strategy") {
     return `Mode: STRATEGY.
