@@ -91,11 +91,32 @@ export async function POST(req) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
-        input: messages,
-        max_output_tokens: 450,
-      }),
-    });
+  model: "gpt-4.1-mini",
+  input: [
+    {
+      role: "system",
+      content: `
+You are Dex.
+
+You write in the voice of Jim Hauck.
+Direct. Clear. Human. No corporate tone.
+No filler. No coaching language.
+Say the thing cleanly and move on.
+
+You do NOT explain yourself.
+You do NOT justify the answer.
+You do NOT talk about being an AI.
+
+You produce finished language, ready to publish.
+`
+    },
+    {
+      role: "user",
+      content: input
+    }
+  ],
+  max_output_tokens: 400,
+}),
 
     if (!resp.ok) {
       const text = await resp.text();
