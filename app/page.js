@@ -26,27 +26,27 @@ export default function Home() {
   const placeholder = useMemo(() => MODES[mode]?.hint ?? 'What do you want to say?', [mode]);
 
   async function generate() {
-    setBusy(true);
-    setOut('');
-    try {
-      const r = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, mode }),
-      });
+  setBusy(true);
+  setOut('');
+  try {
+    const r = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: text, mode }),
+    });
 
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) {
-        setOut(j?.error ? `Error: ${j.error}` : `Error: ${r.status}`);
-        return;
-      }
-      setOut(j.output ?? 'Output could not be parsed.');
-    } catch (e) {
-      setOut(`Error: ${String(e?.message || e)}`);
-    } finally {
-      setBusy(false);
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      setOut(j?.error ? `Error: ${j.error}` : `Error: ${r.status}`);
+      return;
     }
+    setOut(j.output ?? j.result ?? 'Output could not be parsed.');
+  } catch (e) {
+    setOut(`Error: ${String(e?.message || e)}`);
+  } finally {
+    setBusy(false);
   }
+}
 
   function reset() {
     setText('');
