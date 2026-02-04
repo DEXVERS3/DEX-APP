@@ -70,7 +70,7 @@ export default function Home() {
             fontSize: 13,
             cursor: 'pointer',
           }}
-          onClick={() => alert('Control Room is coming next.')}
+          onClick={() => window.location.href = '/control'}
         >
           Control Room
         </button>
