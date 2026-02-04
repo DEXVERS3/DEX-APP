@@ -232,13 +232,15 @@ export default function ControlRoom() {
         <button
           onClick={saveMask}
           disabled={!rant || !explain || !warm}
-          style={{
-            marginTop: 20,
-            padding: '10px 14px',
-            borderRadius: 10,
-            border: 'none',
-            cursor: 'pointer',
-          }}
+         style={{
+  marginTop: 20,
+  padding: '10px 14px',
+  borderRadius: 10,
+  border: 'none',
+  cursor: 'pointer',
+  background: '#ffffff',
+  color: '#000000',
+}}
         >
           Save Mask
         </button>
