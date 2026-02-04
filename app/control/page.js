@@ -69,15 +69,6 @@ const FULL_MASK_SCHEMA = {
     warm: { text: '' },
   },
 
-  build: {
-    invariant: 'DEX_CORE',
-    envelope_logic: {
-      rant_sets_upper_bound: true,
-      explain_sets_spine: true,
-      warm_sets_lower_bound: true,
-    },
-  },
-
   storage: {
     persistence: {
       local_storage_key: 'dex.active_mask.v1',
@@ -116,7 +107,7 @@ export default function ControlRoom() {
       storage: {
         ...FULL_MASK_SCHEMA.storage,
         active: {
-          ...FULL_MASK_SCHEMA.storage.active,
+          is_active: true,
           as_layer: activeMask.id,
         },
       },
@@ -131,6 +122,18 @@ export default function ControlRoom() {
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   }
+
+  const boxStyle = {
+    width: '100%',
+    background: '#0f0f0f',
+    color: '#ffffff',
+    border: '1px solid #2a2a2a',
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 14,
+    lineHeight: 1.5,
+    outline: 'none',
+  };
 
   return (
     <main
@@ -190,34 +193,47 @@ export default function ControlRoom() {
       <section style={{ marginTop: 40 }}>
         <h3>Voice Mask Collection</h3>
 
+        <h4>RANT</h4>
+        <p style={{ color: '#aaa', fontSize: 13, maxWidth: 720 }}>
+          Write the way you speak when you’re fed up and not editing yourself.
+          No cleanup. No politeness. This is not for publishing.
+        </p>
         <textarea
-          placeholder="RANT — unfiltered"
           value={rant}
           onChange={(e) => setRant(e.target.value)}
           rows={4}
-          style={{ width: '100%', marginBottom: 12 }}
+          style={boxStyle}
         />
 
+        <h4 style={{ marginTop: 20 }}>EXPLAIN</h4>
+        <p style={{ color: '#aaa', fontSize: 13, maxWidth: 720 }}>
+          Explain something you understand well to someone smart but unfamiliar.
+          Clear. Direct. Natural tone.
+        </p>
         <textarea
-          placeholder="EXPLAIN — clarity"
           value={explain}
           onChange={(e) => setExplain(e.target.value)}
           rows={4}
-          style={{ width: '100%', marginBottom: 12 }}
+          style={boxStyle}
         />
 
+        <h4 style={{ marginTop: 20 }}>WARM</h4>
+        <p style={{ color: '#aaa', fontSize: 13, maxWidth: 720 }}>
+          Write as you would to someone you care about who’s having a rough time.
+          Don’t fix. Don’t perform. Just be human.
+        </p>
         <textarea
-          placeholder="WARM — human"
           value={warm}
           onChange={(e) => setWarm(e.target.value)}
           rows={4}
-          style={{ width: '100%', marginBottom: 12 }}
+          style={boxStyle}
         />
 
         <button
           onClick={saveMask}
           disabled={!rant || !explain || !warm}
           style={{
+            marginTop: 20,
             padding: '10px 14px',
             borderRadius: 10,
             border: 'none',
