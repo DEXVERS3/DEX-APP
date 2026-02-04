@@ -48,6 +48,10 @@ const MASKS = [
 ];
 
 export default function ControlRoom() {
+const [rant, setRant] = useState("");
+  const [explain, setExplain] = useState("");
+  const [warm, setWarm] = useState("");
+  const [saved, setSaved] = useState(false);
   const [activeMask, setActiveMask] = useState(MASKS[0]);
 
   return (
