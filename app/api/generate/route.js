@@ -58,36 +58,45 @@ const JIM_COPY_ENFORCEMENT = `COPY STANDARD — NON-NEGOTIABLE:
 
 8. If the draft reads statistically average, rewrite once for elevation.
 
-Return ONLY the final script.
+Return ONLY the final output.
 No explanations.
 `;
 
 function modeInstruction(mode) {
   if (mode === "signal") {
     return `Mode: SIGNAL.
-Output ONE version only.
-Keep it punchy, defensible, clean.
+Goal: a clean public-facing version that still sounds like a human.
+Rules:
+- Output ONE version only.
+- Avoid filler openers. No throat-clearing. No “but.”
+- Keep it punchy and defensible.
 
 ${JIM_COPY_ENFORCEMENT}`;
   }
 
   if (mode === "conversation") {
     return `Mode: CONVERSATION.
-Output ONLY the message.
-Dry allowed. Snark allowed when earned.
-Keep it tight.
+Goal: something you’d actually send to one person, in Jim’s voice.
+Rules:
+- Output ONLY the message. No setup text.
+- Dry is fine. Snark is allowed when earned.
+- Pop-culture references allowed if they fit; do not explain them.
+- Do NOT offer help unless the user explicitly asks. No "hit me up" / "I've got you" lines.
+- Keep it tight.
 
 ${JIM_COPY_ENFORCEMENT}`;
   }
 
   if (mode === "strategy") {
     return `Mode: STRATEGY.
+Goal: not losing.
 Return:
 1) Core truth (1–2 lines).
-2) 3–6 bullet moves.
-3) Best next step.
-
-No fluff.
+2) 3–6 bullet moves (leverage-first, specific).
+3) Best next step (one action).
+Rules:
+- No motivational fluff. No corporate tone.
+- Sharp, but still human.
 
 ${JIM_COPY_ENFORCEMENT}`;
   }
@@ -106,9 +115,7 @@ function extractOutputText(data) {
   for (const item of items) {
     if (item?.type === "message" && Array.isArray(item?.content)) {
       for (const c of item.content) {
-        if (c?.type === "output_text" && typeof c?.text === "string") {
-          out += c.text;
-        }
+        if (c?.type === "output_text" && typeof c?.text === "string") out += c.text;
       }
     }
   }
@@ -118,7 +125,16 @@ function extractOutputText(data) {
 export async function POST(req) {
   try {
     const body = await req.json().catch(() => ({}));
-    const text = typeof body.text === "string" ? body.text.trim() : "";
+
+    // Backward compatible: accept either { input } (V3) or { text } (new)
+    const raw =
+      typeof body.input === "string"
+        ? body.input
+        : typeof body.text === "string"
+        ? body.text
+        : "";
+
+    const text = raw.trim();
     const mode = typeof body.mode === "string" ? body.mode : "signal";
 
     if (!text) {
@@ -127,7 +143,7 @@ export async function POST(req) {
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "Server missing OPENAI_API_KEY." }, { status: 500 });
+      return NextResponse.json({ error: "Missing OPENAI_API_KEY." }, { status: 500 });
     }
 
     const resp = await fetch("https://api.openai.com/v1/responses", {
@@ -137,7 +153,7 @@ export async function POST(req) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4.1-mini",
+        model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
         input: [
           { role: "system", content: JIM_CORE_SYSTEM_PROMPT },
           { role: "system", content: modeInstruction(mode) },
@@ -147,16 +163,16 @@ export async function POST(req) {
       }),
     });
 
-    if (!resp.ok) {
-      const detail = await resp.text().catch(() => "");
-      return NextResponse.json(
-        { error: `OpenAI error (${resp.status})`, detail },
-        { status: 500 }
-      );
-    }
-
-    const data = await resp.json();
+    const data = await resp.json().catch(() => ({}));
     const out = extractOutputText(data).trim();
+
+    if (!resp.ok) {
+      const msg =
+        typeof data?.error?.message === "string"
+          ? data.error.message
+          : `OpenAI error: ${resp.status}`;
+      return NextResponse.json({ error: msg }, { status: 500 });
+    }
 
     return NextResponse.json({ output: out || "(No output returned.)" });
   } catch (e) {
